@@ -1,0 +1,15 @@
+src/
+__tests__/
+examples/
+rollup.config.js
+tsconfig.json
+.gitignore
+.github/
+.vscode/
+.idea/
+*.log
+*.tmp
+.DS_Store
+coverage/
+*.test.ts
+*.spec.ts
