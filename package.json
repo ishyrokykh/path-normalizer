@@ -37,9 +37,11 @@
     "postversion": "git push && git push --tags",
     "check-size": "npm run build && npm pack --dry-run && echo '\n📊 Build Output Sizes:' && ls -lh dist/",
     "changelog": "echo '📝 Changelog available at: https://github.com/maguwebdev/path-normalizer/blob/main/CHANGELOG.md'",
-    "release:patch": "npm version patch && npm publish",
-    "release:minor": "npm version minor && npm publish",
-    "release:major": "npm version major && npm publish"
+    "release:patch": "npm version patch && npm publish && npm run github:release",
+    "release:minor": "npm version minor && npm publish && npm run github:release",
+    "release:major": "npm version major && npm publish && npm run github:release",
+    "github:release": "node scripts/create-github-release.js",
+    "github:release:auto": "gh release create $(git describe --tags --abbrev=0) --title \"$(git describe --tags --abbrev=0) - $(git log -1 --pretty=%s)\" --generate-notes"
   },
   "keywords": [
     "path",
