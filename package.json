@@ -1,6 +1,6 @@
 {
   "name": "path-normalizer",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "A flexible path normalization utility for mapping backend error paths to frontend form fields",
   "main": "dist/index.min.cjs",
   "module": "dist/index.min.esm.js",
