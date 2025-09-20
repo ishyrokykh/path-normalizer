@@ -135,7 +135,7 @@ export class PathNormalizer {
   /**
    * Normalize a single path
    */
-  normalizePath(path: string): NormalizedPath {
+  normalizePath(path: string, useDefaultNormalization: boolean = true): NormalizedPath {
     const segments = toPath(path);
 
     for (const rule of this.rules) {
@@ -165,14 +165,19 @@ export class PathNormalizer {
       throw new Error(`No matching rule for path: ${path}`);
     }
 
+    if (useDefaultNormalization) {
+      const normalizedPath = segments.join(this.delimiter);
+      return { original: path, normalized: normalizedPath, matched: false };
+    }
+
     return { original: path, normalized: path, matched: false };
   }
 
   /**
    * Normalize multiple paths
    */
-  normalizePaths(paths: string[]): NormalizedPath[] {
-    return paths.map((path) => this.normalizePath(path));
+  normalizePaths(paths: string[], useDefaultNormalization: boolean = true): NormalizedPath[] {
+    return paths.map((path) => this.normalizePath(path, useDefaultNormalization));
   }
 
   /**
