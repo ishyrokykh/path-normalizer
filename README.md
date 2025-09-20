@@ -237,3 +237,7 @@ Helper functions for common transformations:
 4. **Type-Safe**: Full TypeScript support with proper type inference
 
 5. **Framework Agnostic**
+
+## Changelog
+
+See [CHANGELOG.md](./CHANGELOG.md) for a detailed history of changes and updates.

@@ -63,6 +63,18 @@ describe('PathNormalizer', () => {
       expect(result.matched).toBe(true);
       expect(result.normalized).toBe('users.0.emailAddress');
     });
+
+    it('should convert bracket notation to dot notation by default when no rules match', () => {
+      const result = normalizer.normalizePath('user[0].email[1].test');
+      expect(result.matched).toBe(false);
+      expect(result.normalized).toBe('user.0.email.1.test');
+    });
+
+    it('should not convert bracket notation when useDefaultNormalization is false', () => {
+      const result = normalizer.normalizePath('user[0].email[1].test', false);
+      expect(result.matched).toBe(false);
+      expect(result.normalized).toBe('user[0].email[1].test');
+    });
   });
 
   describe('wildcard matching', () => {

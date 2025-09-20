@@ -1,21 +1,22 @@
 {
   "name": "path-normalizer",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "A flexible path normalization utility for mapping backend error paths to frontend form fields",
-  "main": "dist/index.js",
-  "module": "dist/index.esm.js",
+  "main": "dist/index.min.cjs",
+  "module": "dist/index.min.esm.js",
   "types": "dist/index.d.ts",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "require": "./dist/index.cjs",
-      "import": "./dist/index.esm.js",
-      "default": "./dist/index.esm.js"
+      "require": "./dist/index.min.cjs",
+      "import": "./dist/index.min.esm.js",
+      "default": "./dist/index.min.esm.js"
     }
   },
   "files": [
     "dist",
     "README.md",
+    "CHANGELOG.md",
     "LICENSE"
   ],
   "scripts": {
@@ -34,7 +35,11 @@
     "prepublishOnly": "npm run validate && npm run build",
     "version": "npm run format && git add -A src",
     "postversion": "git push && git push --tags",
-    "check-size": "npm run build && npm pack --dry-run && echo '\n📊 Build Output Sizes:' && ls -lh dist/"
+    "check-size": "npm run build && npm pack --dry-run && echo '\n📊 Build Output Sizes:' && ls -lh dist/",
+    "changelog": "echo '📝 Changelog available at: https://github.com/maguwebdev/path-normalizer/blob/main/CHANGELOG.md'",
+    "release:patch": "npm version patch && npm publish",
+    "release:minor": "npm version minor && npm publish",
+    "release:major": "npm version major && npm publish"
   },
   "keywords": [
     "path",
@@ -65,6 +70,7 @@
   "devDependencies": {
     "@rollup/plugin-commonjs": "^25.0.7",
     "@rollup/plugin-node-resolve": "^15.2.3",
+    "@rollup/plugin-terser": "^0.4.4",
     "@rollup/plugin-typescript": "^11.1.6",
     "@types/jest": "^29.5.12",
     "@types/lodash": "^4.17.0",
