@@ -1,5 +1,29 @@
 # Changelog
 
+## [1.0.2] - 2024-09-20
+
+### Added
+- **Bracket notation support**: Added `useDefaultNormalization` parameter to `normalizePath()` method
+- **Default bracket conversion**: Paths like `'user[0].email[1].test'` are automatically converted to `'user.0.email.1.test'` when no rules match
+- **Dual build system**: Both readable and minified versions of the package
+  - Regular builds (`index.cjs`, `index.esm.js`) for source code inspection in node_modules
+  - Minified builds (`index.min.cjs`, `index.min.esm.js`) for optimal performance
+- **Enhanced build configuration**: 
+  - Production builds with Terser minification
+  - Source maps for debugging
+  - Optimized bundle sizes (8.3K minified vs 36K readable)
+- **Comprehensive changelog system**: Added CHANGELOG.md with detailed version history
+- **Release automation scripts**: Added npm scripts for easier version management
+
+### Changed
+- **Package distribution**: Now uses minified files as main entry points for better performance
+- **Bundle optimization**: Significantly reduced package size through minification
+- **Build process**: Enhanced rollup configuration with separate development and production builds
+
+### Fixed
+- **Package size**: Reduced from 210kB to 129kB unpacked size
+- **Performance**: Minified bundles load faster in production environments
+
 ## [1.0.1] - 2024-09-20
 
 ### Added
