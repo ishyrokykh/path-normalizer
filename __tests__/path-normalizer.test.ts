@@ -13,6 +13,9 @@ describe('PathNormalizer', () => {
       const instance = new PathNormalizer();
       const result = instance.normalizePath('test.path');
       expect(result.original).toBe('test.path');
+
+      const result2 = instance.normalizePath('test[2]path');
+      expect(result2.normalized).toBe('test.2.path');
     });
 
     it('should respect custom delimiter', () => {
