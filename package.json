@@ -1,6 +1,6 @@
 {
   "name": "path-normalizer",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "A flexible path normalization utility for mapping backend error paths to frontend form fields",
   "main": "dist/index.min.cjs",
   "module": "dist/index.min.esm.js",
@@ -36,7 +36,7 @@
     "version": "npm run format && git add -A src",
     "postversion": "git push && git push --tags",
     "check-size": "npm run build && npm pack --dry-run && echo '\n📊 Build Output Sizes:' && ls -lh dist/",
-    "changelog": "echo '📝 Changelog available at: https://github.com/maguwebdev/path-normalizer/blob/main/CHANGELOG.md'",
+    "changelog": "echo '📝 Changelog available at: https://github.com/ishyrokykh/path-normalizer/blob/main/CHANGELOG.md'",
     "release:patch": "npm version patch && npm publish && npm run github:release",
     "release:minor": "npm version minor && npm publish && npm run github:release",
     "release:major": "npm version major && npm publish && npm run github:release",
@@ -57,15 +57,15 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/maguwebdev/path-normalizer.git"
+    "url": "https://github.com/ishyrokykh/path-normalizer.git"
   },
   "bugs": {
-    "url": "https://github.com/maguwebdev/path-normalizer/issues"
+    "url": "https://github.com/ishyrokykh/path-normalizer/issues"
   },
   "engines": {
     "node": ">=14.0.0"
   },
-  "homepage": "https://github.com/maguwebdev/path-normalizer#readme",
+  "homepage": "https://github.com/ishyrokykh/path-normalizer#readme",
   "dependencies": {
     "lodash": "^4.17.0"
   },

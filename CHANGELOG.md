@@ -1,5 +1,23 @@
 # Changelog
 
+## [1.0.3] - 2024-12-19
+
+### Changed
+- **README overhaul**: Completely rewritten README for broader npm audience appeal
+- **Improved documentation**: Added compelling value proposition and real-world examples
+- **Enhanced examples**: Added simple bracket notation conversion examples (`test[0].path` → `test.0.path`)
+- **Better use cases**: Added 4 practical scenarios (API mapping, form validation, config normalization, multi-language)
+- **Framework integration**: Added React Hook Form and Formik integration examples
+- **Streamlined API reference**: Focused on most important methods and patterns
+- **npm-friendly features**: Emphasized zero-config, universal compatibility, and performance
+
+### Added
+- **Quick Examples section**: Immediate value demonstration with simple path conversions
+- **Common Use Cases**: 4 real-world scenarios developers face daily
+- **Framework Integration**: Ready-to-use code for React Hook Form and Formik
+- **Why Choose section**: Clear benefits and competitive advantages
+- **Get Started Today**: Clear call-to-action with installation and use cases
+
 ## [1.0.2] - 2024-09-20
 
 ### Added

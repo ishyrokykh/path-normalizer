@@ -1,102 +1,131 @@
 # Path Normalizer
 
-A flexible and powerful path normalization utility for mapping backend error paths to frontend form fields. Perfect for handling complex form validation scenarios where backend and frontend field structures don't match.
+**Transform any path format into any other format** - the ultimate path mapping utility for JavaScript/TypeScript applications.
 
-## Features
+Perfect for handling API responses, form validation errors, configuration mapping, and any scenario where you need to convert between different path structures.
 
-- 🎯 **Flexible Pattern Matching**: Support for exact matches, wildcards, regex, and custom matchers
-- 🌳 **Tree-like Structure**: Efficient matching with support for nested paths and deep wildcards
-- 🔄 **Transform Functions**: Powerful transformation capabilities for complex path mappings
-- 📦 **TypeScript Support**: Full type safety and IntelliSense support
-- 🎨 **Builder Pattern**: Intuitive API for creating rules
-- ⚡ **Performance Optimized**: Priority-based rule evaluation for optimal performance
-- 🔧 **Framework Agnostic**: Works with any form library (react-hook-form, formik, etc.)
+## Why You Need This
+
+Ever struggled with these common problems?
+
+- **API returns**: `user[0].email` but your form expects `users.0.emailAddress`
+- **Backend errors**: `text_templates['en'].title` but frontend needs `localization[0].fields.title`
+- **Config mapping**: `api.users.profile` needs to become `internal.userData.profile`
+
+Path Normalizer solves all of these with simple, powerful rules.
 
 ## Installation
 
 ```bash
 npm install path-normalizer
-# or
-yarn add path-normalizer
-# or
-pnpm add path-normalizer
 ```
 
-## Quick Start
+## Quick Examples
 
+### Basic Path Conversion
 ```typescript
-import { PathNormalizer, PathRuleBuilder } from 'path-normalizer';
+import { PathNormalizer } from 'path-normalizer';
 
-// Create a normalizer instance
-const normalizer = new PathNormalizer({
-  delimiter: '.',
-  caseInsensitive: false
+const normalizer = new PathNormalizer();
+
+// Convert bracket notation to dot notation
+normalizer.normalizePath("test[0].path"); 
+// → "test.0.path"
+
+// Map specific paths
+normalizer.addRule(['user', 'email'], () => 'profile.email');
+normalizer.normalizePath('user.email'); 
+// → "profile.email"
+```
+
+### Wildcard Matching
+```typescript
+// Match any user ID
+normalizer.addRule(['users', '*', 'email'], (_, context) => {
+  const userId = context.segments[1];
+  return `user_${userId}_email`;
 });
 
-// Add a simple rule
-normalizer.addRule(
-  ['user', 'email'],
-  (matched) => ['profile', 'contact', 'email']
-);
-
-// Normalize a path
-const result = normalizer.normalizePath('user.email');
-console.log(result.normalized); // 'profile.contact.email'
+normalizer.normalizePath('users.123.email'); 
+// → "user_123_email"
 ```
 
-## Advanced Usage
-
-### Wildcard Patterns
-
+### Real-World Form Validation
 ```typescript
-// Single wildcard - matches any single segment
-normalizer.addRule(
-  ['users', '*', 'email'],
-  (matched, context) => {
-    const userId = context.segments[1];
-    return `users[${userId}].emailAddress`;
-  }
-);
+// Backend: "text_templates['en'].title"
+// Frontend: "localization[0].fields.title"
 
-// Deep wildcard - matches any remaining segments
-normalizer.addRule(
-  ['api', 'v1', '**'],
-  (matched, context) => {
-    const remainingPath = context.segments.slice(2);
-    return ['internal', 'api', ...remainingPath];
-  }
-);
+const locales = ['en', 'fr', 'de'];
+normalizer.addRule(['text_templates', (s) => locales.includes(s), '*'], (_, context) => {
+  const locale = context.segments[1];
+  const field = context.segments[2];
+  const index = locales.indexOf(locale);
+  return `localization[${index}].fields.${field}`;
+});
+
+normalizer.normalizePath("text_templates['en'].title");
+// → "localization[0].fields.title"
 ```
 
-### Using the Builder Pattern
+## Key Features
 
+- ⚡ **Zero Config**: Works out of the box with sensible defaults
+- 🎯 **Smart Matching**: Wildcards, regex, and custom matchers
+- 🔄 **Flexible Transform**: Convert any path to any other format
+- 📦 **TypeScript**: Full type safety and IntelliSense
+- 🚀 **Performance**: Priority-based rule evaluation
+- 🔧 **Universal**: Works with any framework or library
+
+## Common Use Cases
+
+### 1. API Response Mapping
 ```typescript
-const rule = PathRuleBuilder.create()
-  .exact('text_templates')
-  .oneOf(['en', 'ua', 'az']) // Match any of these locales
-  .deepWildcard() // Match any nested path
-  .transform((matched, context) => {
-    const locale = context.segments[1];
-    const localeIndex = ['en', 'ua', 'az'].indexOf(locale);
-    const remainingPath = context.segments.slice(2);
-    
-    return [
-      'localization_fields',
-      localeIndex.toString(),
-      'text_templates',
-      ...remainingPath
-    ];
-  })
-  .setPriority(10) // Higher priority rules are evaluated first
-  .build();
+// API returns: "user[0].profile.email"
+// Your app expects: "users.0.emailAddress"
 
-normalizer.addRules([rule]);
+normalizer.addRule(['user', '*', 'profile', 'email'], (_, context) => {
+  const userId = context.segments[1];
+  return `users.${userId}.emailAddress`;
+});
 ```
 
-### React Hook Form Integration
-
+### 2. Form Validation Error Mapping
 ```typescript
-import { useEffect, useMemo } from 'react';
+// Backend error: "form_data['contact'].email"
+// React Hook Form field: "contact.email"
+
+normalizer.addRule(['form_data', '*', 'email'], (_, context) => {
+  const section = context.segments[1];
+  return `${section}.email`;
+});
+```
+
+### 3. Configuration Normalization
+```typescript
+// Config file: "api.users.profile.settings"
+// Internal structure: "userConfig.profile"
+
+normalizer.addRule(['api', 'users', 'profile', '**'], () => 'userConfig.profile');
+```
+
+### 4. Multi-language Content Mapping
+```typescript
+// CMS path: "content['en'].sections[0].title"
+// App path: "localization.en.sections.0.title"
+
+normalizer.addRule(['content', '*', 'sections', '*', '*'], (_, context) => {
+  const lang = context.segments[1];
+  const sectionIndex = context.segments[3];
+  const field = context.segments[4];
+  return `localization.${lang}.sections.${sectionIndex}.${field}`;
+});
+```
+
+## Framework Integration
+
+### React Hook Form
+```typescript
+import { useEffect } from 'react';
 import { UseFormReturn } from 'react-hook-form';
 import { PathNormalizer } from 'path-normalizer';
 
@@ -126,118 +155,138 @@ export function useNormalizedFormErrors({
 }
 ```
 
-## Real-World Example
-
-Handling complex backend error paths in a multi-language form:
-
+### Formik
 ```typescript
-// Backend sends: text_templates['en'].text
-// Frontend needs: localization_fields.0.text_templates.text
+import { FormikErrors } from 'formik';
+import { PathNormalizer } from 'path-normalizer';
 
-const normalizer = new PathNormalizer();
-const allowedLocales = ['en', 'ua', 'az'];
-
-normalizer.addRule(
-  ['text_templates', (seg) => allowedLocales.includes(seg), '**'],
-  (matched, context) => {
-    const locale = context.segments[1];
-    const localeIndex = allowedLocales.indexOf(locale);
-    const remainingPath = context.segments.slice(2);
-    
-    return [
-      'localization_fields',
-      localeIndex.toString(),
-      'text_templates',
-      ...remainingPath
-    ].join('.');
-  },
-  10 // High priority
-);
-
-// Test it
-const paths = [
-  "text_templates['en'].text",
-  "text_templates['en'].variables[0]",
-  "text_templates['az'].settings.enabled"
-];
-
-paths.forEach(path => {
-  const result = normalizer.normalizePath(path);
-  console.log(`${path} -> ${result.normalized}`);
-});
-
-// Output:
-// text_templates['en'].text -> localization_fields.0.text_templates.text
-// text_templates['en'].variables[0] -> localization_fields.0.text_templates.variables.0
-// text_templates['az'].settings.enabled -> localization_fields.2.text_templates.settings.enabled
+const normalizeFormErrors = (errors: Record<string, string>, normalizer: PathNormalizer) => {
+  const normalized: FormikErrors<any> = {};
+  
+  Object.entries(errors).forEach(([path, message]) => {
+    const result = normalizer.normalizePath(path);
+    if (result.matched && result.normalized) {
+      normalized[result.normalized] = message;
+    }
+  });
+  
+  return normalized;
+};
 ```
 
 ## API Reference
 
-### PathNormalizer
-
-#### Constructor Options
+### Core Methods
 
 ```typescript
-interface PathNormalizerOptions {
-  delimiter?: string;        // Path delimiter (default: '.')
-  caseInsensitive?: boolean; // Case-insensitive matching (default: false)
-  throwOnUnmatched?: boolean; // Throw error for unmatched paths (default: false)
-}
+// Create normalizer
+const normalizer = new PathNormalizer({
+  delimiter: '.',           // Path separator (default: '.')
+  caseInsensitive: false,   // Case-sensitive matching (default: false)
+  throwOnUnmatched: false   // Don't throw on unmatched paths (default: false)
+});
+
+// Add rules
+normalizer.addRule(['user', 'email'], () => 'profile.email');
+normalizer.addRule(['users', '*', 'email'], (_, context) => {
+  const userId = context.segments[1];
+  return `user_${userId}_email`;
+});
+
+// Normalize paths
+const result = normalizer.normalizePath('user.email');
+// result.normalized = 'profile.email'
+// result.matched = true
+// result.original = 'user.email'
+
+// Normalize multiple paths
+const results = normalizer.normalizePaths(['user.email', 'users.123.email']);
 ```
 
-#### Methods
+### Pattern Types
 
-- `addRule(pattern, transform, priority?)`: Add a normalization rule
-- `addRules(rules)`: Add multiple rules at once
-- `normalizePath(path)`: Normalize a single path
-- `normalizePaths(paths)`: Normalize multiple paths
-- `clearRules()`: Remove all rules
+```typescript
+// Exact match
+['user', 'email']
 
-### PathRuleBuilder
+// Wildcard (any single segment)
+['users', '*', 'email']
 
-Fluent API for building rules:
+// Deep wildcard (any remaining segments)
+['api', '**']
 
-- `exact(segment)`: Match exact segment
-- `regex(pattern)`: Match with regex
-- `wildcard()`: Match any single segment
-- `deepWildcard()`: Match any remaining segments
-- `oneOf(values)`: Match any of the provided values
-- `custom(matcher)`: Custom matcher function
-- `transform(fn)`: Set transformation function
-- `setPriority(n)`: Set rule priority
-- `build()`: Build the rule
+// Regex
+[/^user_\d+$/, 'email']
 
-### PathTransformers
+// Custom matcher function
+['items', (seg) => !isNaN(Number(seg)), 'value']
 
-Helper functions for common transformations:
+// Mixed patterns
+['data', '*', /^(name|email)$/, '**']
+```
 
-- `replaceSegment(index, newValue)`: Replace a segment at index
-- `prefix(...segments)`: Add prefix segments
-- `mapTo(template, replacements)`: Map to template with replacements
-- `remove()`: Remove the path entirely
+### Advanced Features
 
-## Comparison with Alternatives
+```typescript
+// Priority-based rules (higher number = higher priority)
+normalizer.addRule(['user', '*'], () => 'low-priority', 1);
+normalizer.addRule(['user', 'email'], () => 'high-priority', 10);
 
-| Feature | path-normalizer | path-to-regexp
-|---------|--------------|--------------
-| Wildcard support | ✅ |  ✅
-| Custom matchers | ✅ | ❌
-| Tree-like patterns | ✅ | ❌
-| TypeScript | ✅ | ✅
+// Builder pattern for complex rules
+import { PathRuleBuilder } from 'path-normalizer';
 
-## Why Use This Library?
+const rule = PathRuleBuilder.create()
+  .exact('text_templates')
+  .oneOf(['en', 'fr', 'de'])
+  .deepWildcard()
+  .transform((matched, context) => {
+    const locale = context.segments[1];
+    const index = ['en', 'fr', 'de'].indexOf(locale);
+    return `localization[${index}].${context.segments.slice(2).join('.')}`;
+  })
+  .setPriority(10)
+  .build();
 
-1. **Designed for Real-World Form Validation**: Built specifically for the common problem of mapping backend validation errors to frontend form fields
+normalizer.addRules([rule]);
+```
 
-2. **Flexible Pattern Matching**: Unlike simple string replacement, supports complex patterns including wildcards, regex, and custom matchers
+## Why Choose Path Normalizer?
 
-3. **Performance Optimized**: Priority-based evaluation ensures the most likely rules are checked first
+### ✅ **Built for Real Problems**
+- Solves actual pain points developers face daily
+- Handles complex API-to-frontend path mapping
+- Works with any form library or framework
 
-4. **Type-Safe**: Full TypeScript support with proper type inference
+### ✅ **Powerful Yet Simple**
+- Zero configuration needed to get started
+- Intuitive API that scales from simple to complex
+- Full TypeScript support with excellent IntelliSense
 
-5. **Framework Agnostic**
+### ✅ **Performance First**
+- Priority-based rule evaluation
+- Optimized for high-frequency path transformations
+- Minimal bundle size impact
 
-## Changelog
+### ✅ **Battle Tested**
+- Comprehensive test coverage
+- Used in production applications
+- Active maintenance and updates
 
-See [CHANGELOG.md](./CHANGELOG.md) for a detailed history of changes and updates.
+## Get Started Today
+
+```bash
+npm install path-normalizer
+```
+
+**Perfect for:**
+- Form validation error mapping
+- API response transformation  
+- Configuration normalization
+- Multi-language content mapping
+- Any path-to-path conversion needs
+
+---
+
+📖 **Full Documentation**: [GitHub Repository](https://github.com/ishyrokykh/path-normalizer)  
+🐛 **Report Issues**: [GitHub Issues](https://github.com/ishyrokykh/path-normalizer/issues)  
+📝 **Changelog**: [CHANGELOG.md](./CHANGELOG.md)
